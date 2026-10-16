@@ -86,6 +86,25 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+// Root Welcome & Status Endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    name: '🍃 BookLeaf Publishing — Author Support & Communication API',
+    status: 'ONLINE & HEALTHY',
+    version: '1.0.0',
+    message: 'Backend server is running smoothly on Render.',
+    healthCheck: '/api/health',
+    endpoints: {
+      auth: '/api/auth',
+      tickets: '/api/tickets',
+      author: '/api/author',
+      admin: '/api/admin',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // System Health Check Endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
@@ -95,6 +114,7 @@ app.get('/api/health', (req, res) => {
     uptime: `${process.uptime().toFixed(1)}s`,
   });
 });
+
 
 // Mount application API routes
 app.use('/api/auth', authRoutes);
