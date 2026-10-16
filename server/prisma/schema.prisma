@@ -1,0 +1,168 @@
+// Prisma schema for BookLeaf Publishing Author Support & Communication Portal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Roles
+enum Role {
+  AUTHOR
+  ADMIN
+}
+
+// Ticket Status Lifecycle
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+// Assignment Specified 6 Ticket Categories
+enum TicketCategory {
+  ROYALTY_AND_PAYMENTS
+  ISBN_AND_METADATA_ISSUES
+  PRINTING_AND_QUALITY
+  DISTRIBUTION_AND_AVAILABILITY
+  BOOK_STATUS_AND_PRODUCTION_UPDATES
+  GENERAL_INQUIRY
+}
+
+// Assignment Specified Priority Levels
+enum TicketPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// User Model (Both Authors and Admins)
+model User {
+  id              String         @id @default(uuid())
+  authorCode      String?        @unique // e.g. "AUTH001" (null for admins)
+  name            String
+  email           String         @unique
+  password        String         // bcrypt hashed
+  role            Role           @default(AUTHOR)
+  phone           String?
+  city            String?
+  joinedDate      DateTime?
+  
+  // Relations
+  books           Book[]
+  tickets         Ticket[]       @relation("AuthorTickets")
+  assignedTickets Ticket[]       @relation("AssignedAdmin")
+  messages        TicketMessage[]
+  internalNotes   InternalNote[]
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+// Book Model (Matches bookleaf_sample_data.json)
+model Book {
+  id                    String    @id @default(uuid())
+  bookCode              String    @unique // e.g. "BK001"
+  authorId              String
+  author                User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title                 String
+  isbn                  String
+  genre                 String
+  publicationDate       DateTime? // Nullable for books in production
+  status                String    // e.g. "Published & Live", "In Production - Cover Design", "In Production - Typesetting"
+  mrp                   Float?    // Nullable for books in production
+  authorRoyaltyPerCopy  Float?    // Nullable for books in production
+  totalCopiesSold       Int       @default(0)
+  totalRoyaltyEarned    Float     @default(0)
+  royaltyPaid           Float     @default(0)
+  royaltyPending        Float     @default(0)
+  lastRoyaltyPayoutDate DateTime? // Nullable if no payouts yet
+  printPartner          String?   // e.g. "In-House", "Repro India", "Epitome Books"
+  availableOn           String[]  // Array of platforms: Amazon India, Flipkart, etc.
+
+  // Relations
+  tickets               Ticket[]
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+}
+
+// Ticket Model (Core support ticket entity)
+model Ticket {
+  id              String         @id @default(uuid())
+  ticketNumber    String         @unique // e.g. "BL-1001"
+  authorId        String
+  author          User           @relation("AuthorTickets", fields: [authorId], references: [id], onDelete: Cascade)
+  
+  bookId          String?        // Nullable: query can be "General / Account Level"
+  book            Book?          @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  
+  subject         String
+  description     String         @db.Text
+  status          TicketStatus   @default(OPEN)
+  category        TicketCategory @default(GENERAL_INQUIRY)
+  priority        TicketPriority @default(MEDIUM)
+
+  // AI-Assisted fields
+  aiCategory      TicketCategory?
+  aiPriority      TicketPriority?
+  aiConfidence    Float?         // 0.0 to 1.0 confidence score
+  aiDraftResponse String?        @db.Text // AI generated draft response for admin review
+
+  // Admin Assignment
+  assignedToId    String?
+  assignedTo      User?          @relation("AssignedAdmin", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  // Relations
+  messages        TicketMessage[]
+  internalNotes   InternalNote[]
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+  @@index([priority])
+  @@index([category])
+  @@index([createdAt])
+}
+
+// Ticket Conversation Message (Author & Admin visible messages)
+model TicketMessage {
+  id            String    @id @default(uuid())
+  ticketId      String
+  ticket        Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  message       String    @db.Text
+  isAiGenerated Boolean   @default(false)
+
+  createdAt     DateTime  @default(now())
+
+  @@index([ticketId])
+}
+
+// Internal Admin Notes (Strictly hidden from Author)
+model InternalNote {
+  id        String    @id @default(uuid())
+  ticketId  String
+  ticket    Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  note      String    @db.Text
+
+  createdAt DateTime  @default(now())
+
+  @@index([ticketId])
+}

@@ -1,0 +1,35 @@
+{
+  "name": "bookleaf-portal",
+  "version": "1.0.0",
+  "description": "BookLeaf Publishing Author Support & Communication Portal",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm run install:server && npm run install:client",
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "db:migrate": "cd server && npx prisma migrate dev",
+    "db:seed": "cd server && node prisma/seed.js",
+    "db:studio": "cd server && npx prisma studio",
+    "test": "npm --prefix server test",
+    "build": "npm --prefix client run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "bookleaf",
+    "publishing",
+    "support-portal",
+    "generative-ai",
+    "groq",
+    "react",
+    "nodejs",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "BookLeaf Candidate",
+  "license": "ISC"
+}

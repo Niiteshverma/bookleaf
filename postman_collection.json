@@ -1,0 +1,455 @@
+{
+  "info": {
+    "_postman_id": "bookleaf-support-api-2026",
+    "name": "BookLeaf Publishing Support & Communication Portal API",
+    "description": "Comprehensive Postman collection for testing Author and Admin endpoints, AI drafts, real-time events, and authentication.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "authorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticketId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Author (Priya Sharma)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('authorToken', res.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"priya.sharma@email.com\",\n  \"password\": \"author123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Admin (Operations Lead)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('adminToken', res.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@bookleaf.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Author Portal",
+      "item": [
+        {
+          "name": "Get My Books",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/author/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["author", "books"]
+            }
+          }
+        },
+        {
+          "name": "Get Author Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/author/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["author", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Get Books Dropdown",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/author/books-dropdown",
+              "host": ["{{baseUrl}}"],
+              "path": ["author", "books-dropdown"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets & AI Workflow",
+      "item": [
+        {
+          "name": "Create Support Ticket (AI Triggered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ticket) {",
+                  "    pm.collectionVariables.set('ticketId', res.ticket.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"When will my pending royalties for Q4 be transferred?\",\n  \"description\": \"I have an accumulated royalty of ₹3,570. Could you please confirm the payout window?\",\n  \"bookId\": \"general\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets"]
+            }
+          }
+        },
+        {
+          "name": "Get Author's My Tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/my-tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "my-tickets"]
+            }
+          }
+        },
+        {
+          "name": "Get Ticket Detail (Author)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}"]
+            }
+          }
+        },
+        {
+          "name": "Author Post Reply Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Thank you, I have verified my bank account IFSC on the portal.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "messages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Operations",
+      "item": [
+        {
+          "name": "Get All Tickets Queue (Filtered)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/tickets?status=ALL&priority=ALL",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "tickets"],
+              "query": [
+                { "key": "status", "value": "ALL" },
+                { "key": "priority", "value": "ALL" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Admin Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard-stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard-stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Admin Team List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/team",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "team"]
+            }
+          }
+        },
+        {
+          "name": "Approve & Send AI Draft Response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Dear Author, we have confirmed your bank records and your payout of ₹3,570 is queued for batch release next Tuesday.\",\n  \"resolved\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/approve-ai-draft",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "approve-ai-draft"]
+            }
+          }
+        },
+        {
+          "name": "Add Private Internal Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Internal check completed: Accounts department notified of batch payout.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/internal-notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "internal-notes"]
+            }
+          }
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Override Ticket Classification",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ROYALTY_AND_PAYMENTS\",\n  \"priority\": \"HIGH\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tickets/{{ticketId}}/classification",
+              "host": ["{{baseUrl}}"],
+              "path": ["tickets", "{{ticketId}}", "classification"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
