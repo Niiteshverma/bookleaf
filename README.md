@@ -8,9 +8,18 @@ The system features two tailored interfaces:
 
 ---
 
+## 🌐 Live Deployed Application
+
+- **Live Web App (Vercel):** [https://bookleaf-8sbhdpxl1-niiteshverma.vercel.app](https://bookleaf-8sbhdpxl1-niiteshverma.vercel.app)
+- **Live Backend API (Render):** [https://bookleaf-1-zcbb.onrender.com](https://bookleaf-1-zcbb.onrender.com)
+- **API Health Check:** [https://bookleaf-1-zcbb.onrender.com/api/health](https://bookleaf-1-zcbb.onrender.com/api/health)
+
+---
+
 ## 🚀 Live Demo Credentials
 
 Use these pre-seeded accounts to evaluate the portal immediately:
+
 
 | Role | Name | Email | Password | Details |
 | :--- | :--- | :--- | :--- | :--- |
