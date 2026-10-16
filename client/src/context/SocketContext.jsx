@@ -4,7 +4,8 @@ import { useAuth } from './AuthContext.jsx';
 
 const SocketContext = createContext(null);
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || (import.meta.env.PROD ? window.location.origin : 'http://localhost:5000');
+
 
 export function SocketProvider({ children }) {
   const { user, isAuthenticated, isAdmin, isAuthor } = useAuth();

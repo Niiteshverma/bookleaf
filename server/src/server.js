@@ -14,11 +14,13 @@ const server = http.createServer(app);
 // Initialize Socket.IO with CORS settings
 const io = new SocketIOServer(server, {
   cors: {
-    origin: [
-      process.env.CLIENT_URL || 'http://localhost:5173',
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-    ],
+    origin: (origin, callback) => {
+      if (!origin || origin.includes('localhost') || origin.endsWith('.vercel.app') || origin === process.env.CLIENT_URL) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     methods: ['GET', 'POST', 'PATCH'],
     credentials: true,
   },

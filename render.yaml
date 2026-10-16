@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: bookleaf-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile

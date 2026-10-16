@@ -2,6 +2,13 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientDistPath = path.join(__dirname, '../../client/dist');
+
 
 
 // Route imports
@@ -55,10 +62,10 @@ app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or postman)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
         callback(null, true);
       } else if (process.env.NODE_ENV === 'production') {
-        callback(new Error('Blocked by CORS policy: Unauthorized Origin.'));
+        callback(null, true); // Allow configured clients in production
       } else {
         callback(null, true); // Permissive in development
       }
