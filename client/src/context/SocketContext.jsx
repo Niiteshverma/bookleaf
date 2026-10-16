@@ -4,7 +4,12 @@ import { useAuth } from './AuthContext.jsx';
 
 const SocketContext = createContext(null);
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || (import.meta.env.PROD ? window.location.origin : 'http://localhost:5000');
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL ||
+  (isLocal ? 'http://localhost:5000' : 'https://bookleaf-1-zcbb.onrender.com');
+
 
 
 export function SocketProvider({ children }) {
